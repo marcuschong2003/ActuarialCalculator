@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LC1 Calculator</title>
+    <link rel="stylesheet" href="LC1.css">
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </head>
+</head>
+<body>
+    <div id="input"><p id="inputtext">Input</p>
+    <table id="inputtable">
+        <tr><th>Variable</th><th>Value</th></tr>
+        <tr><td class="label">Assumption</td><td class="value"><select name="Assumption" id="Assumptions"><option value="Uniform">Uniform Distribution of Death</option><option value="FOM">Constant Force of Mortality</option></select></td></tr>
+        <tr><td class="label">Force of Mortality</td><td class="value"><input type="number" name="FOM" id="FOMV" value="0.05" disabled></td></tr>
+        <tr><td class="label">Limiting Age \(\omega\)</td><td class="value"><input type="number" name="omega" id="omegaV" value="100"></td></tr>
+        <tr><td class="label">Benefit</td><td class="value"><input type="number" name="Benefit" id="BenefitV" value="1"></td></tr>
+        <tr><td class="label">Interest: <select name="Interest Type" id="InterestType"><option value="annual">Annual</option><option value="frequency">Non-Annual</option><option value="delta">Force of Interest</option></select></td><td class="value"><input type="number" name="Interest" id="InterestV" value="0.05"></td></tr>
+        <tr><td class="label">Interest Frequency:</td><td class="value"><input type="number" name="InterestFrequency" id="InterestFrequencyV" disabled="disabled"></td></tr>
+        <tr><td class="label">Current Age:</td><td><input type="number" name="Age" id="AgeV"></td></tr>
+        <tr><td class="label">Term Type: </td><td class="value"><select name="Term" id="Termselect" disabled><option value="N">N-year Term</option><option value="Life">Life</option></select></td></tr>
+        <tr><td class="label">Term: </td><td class="value"><input type="number" name="Termlength" id="TermV"></td></tr>
+        <tr><td class="label">k:</td><td class="value"><input type="number" name="k" id="k" value="1"></td></tr>
+        <tr><td class="label">t:</td><td class="value"><input type="number" name="t" id="t" value="1"></td></tr>
+        <tr><td colspan="2"><div id="buttondiv"><p id="ButtonText">Calculate</p></div></td></tr>
+    </table>
+    </div>
+    <div id="output"><p id="outputtext">Output</p>
+    <table id="outputtable">
+        <tr><th>Output</th><th>Value</th></tr>
+        <tr><td class="label">\(\mu\)</td><td class="value"><p id="FOMoutput">0.05</p></td></tr>
+        <tr><td class="label">\({}^{}_tp_x^{}\)</td><td class="value"><p id="tpxoutput"></p></td></tr>
+        <tr><td class="label">\({}^{}_{k|}q_{x}^{}\)<td class="value"><p id="kbarqxoutput"></p></td></tr>
+        <tr><td class="label">\(\require{enclose}\mathring {e}_{x}\)</td><td class="value"><p id="exnaught"></p></td></tr>
+        <tr><td class="label">\(\mathring{e}_{x:\enclose{actuarial}{n}}\)</td><td class="value"><p id="exnaught:n"></p></td></tr>
+        <tr><td class="label">\(E[T_x^2]\)</td><td class="value"><p id="etx2"></p></td></tr>
+        <tr><td class="label">\(Var(T_x)\)</td><td class="value"><p id="vartx"></p></td></tr>
+        <tr><td class="label">\(e_x\)</td><td class="value"><p id="ex"></p></td></tr>
+        <tr><td class="label">\(e_{x:\enclose{actuarial}{n}}\)</td><td class="value"><p id="ex:n"></p></td></tr>
+        <tr><td class="label">\(\bar A_{x}\)</td><td class="value"><p id="lifeinsurance"></p></td></tr>
+        <tr><td class="label">\(\bar A^{1}_{x:\enclose{actuarial}{n}}\)</td><td class="value"><p id="nyearterminsurance"></p></td></tr>
+        <tr><td class="label">\(\bar A^{\ \ \ \ 1}_{x:\enclose{actuarial}{n}}\)</td><td class="value"><p id="nyearpureendowment"></p></td></tr>
+        <tr><td class="label">\({}^{}_{n|}\bar A_x\)</td><td class="value"><p id="nyeardefferedlifeinsurance"></p></td></tr>
+        <tr id="discretelife1" class="Discrete"><td class="label">\(A^1_{x:\enclose{actuarial}{n}}\)</td><td class="value"><p id="discretenyearinsurance"></p></td></tr>
+        <tr id="discretelife2" class="Discrete"><td class="label">\(A_{x:\enclose{actuarial}{n}}\)</td><td class="value"><p id="discretenyearendowmentinsurance"></p></td></tr>
+        <tr id="discretelife3" class="Discrete"><td class="label">\({}^{}_{n|}A_x\)</td><td class="value"><p id="discretenyeardeferredinsurance"></p></td></tr>
+        <tr id="discretelife4" class="Discrete"><td class="label">\(A_x\)</td><td class="value"><p id="discretelifeinsurance"></p></td></tr>
+    </table>
+    </div>
+</body>
+<script>
+    var button = document.getElementById("buttondiv")
+    var FOM = document.getElementById("FOMV")
+    var omega = document.getElementById('omegaV')
+    var Benefit = document.getElementById("BenefitV")
+    var interesttype = document.getElementById("InterestType")
+    var interestinput = document.getElementById("InterestV")
+    var InterestFrequencyV = document.getElementById("InterestFrequencyV")
+    var assumption = document.getElementById("Assumptions")
+    var termtype = document.getElementById("Termselect")
+    var termlength = document.getElementById("TermV")
+    var age = document.getElementById("AgeV")
+    var k = document.getElementById("k")
+    var t = document.getElementById("t")
+    // 上述為輸入區 友好的分界綫
+    var outputdiv = document.getElementById("output");
+    var FOMOutput = document.getElementById("FOMoutput")
+    var tpxoutput = document.getElementById("tpxoutput")
+    var kbarqxoutput = document.getElementById("kbarqxoutput")
+    var expectedcontinuous = document.getElementById("exnaught")
+    var nyearexpectedcontinuous = document.getElementById("exnaught:n")
+    var secondmomentTx = document.getElementById("etx2")
+    var variancetx = document.getElementById("vartx")
+    var expecteddiscrete = document.getElementById("ex")
+    var nyearexpecteddiscrete = document.getElementById("ex:n")
+    var lifeinsurance = document.getElementById("lifeinsurance")
+    var nyearterminsurance = document.getElementById("nyearterminsurance")
+    var nyearpureendowment = document.getElementById("nyearpureendowment")
+    var nyeardefferedlifeinsurance = document.getElementById("nyeardefferedlifeinsurance")
+    var discretelifeinsurance = document.getElementById("discretelifeinsurance")
+    var discretenyearinsurance = document.getElementById("discretenyearinsurance")
+    var discretenyearendowmentinsurance = document.getElementById("discretenyearendowmentinsurance")
+    var discretenyeardeferredinsurance = document.getElementById("discretenyeardeferredinsurance")
+    // console.log(discreterows)
+    interesttype.onchange = function(){
+        if (interesttype.value =="frequency"){
+            InterestFrequencyV.disabled='';
+        }else{
+            InterestFrequencyV.value="";
+            InterestFrequencyV.disabled='disabled';
+        }
+    }
+    assumption.onchange = function(){
+        outputdiv.style.border = ""
+        if(assumption.value == "Uniform"){
+            termtype.value = "N";
+            termtype.disabled = true;
+            termlength.disabled = false;
+            FOM.disabled = true
+            omega.disabled = false
+            document.getElementById("discretelife1").style.visibility = "visible"
+            document.getElementById("discretelife2").style.visibility = "visible"
+            document.getElementById("discretelife3").style.visibility = "visible"
+            document.getElementById("discretelife4").style.visibility = "visible"
+            // for(var x=0;x<discreterows;x++){
+                //     discreterows[x].style.visibility = "collapse"
+            // }
+            
+        }if(assumption.value == "FOM"){
+            termtype.disabled = false;
+            FOM.disabled = false
+            omega.disabled = true
+            document.getElementById("discretelife1").style.visibility = "collapse"
+            document.getElementById("discretelife2").style.visibility = "collapse"
+            document.getElementById("discretelife3").style.visibility = "collapse"
+            document.getElementById("discretelife4").style.visibility = "collapse"
+            // for(var x=0;x<discreterows;x++){
+            //     discreterows[x].style.visibility = "visible"
+            // }
+        }
+    }
+    termtype.onchange = function(){
+        if(termtype.value == "Life"){
+            termlength.value = ""
+            termlength.disabled = true;
+        }else{
+            termlength.disabled = false;
+        }
+    }
+    button.onclick = function(){
+        // Force of Mortality(0), limiting age(1), Benefit(2), Force of Interest(3)(int),Interest Frequency(4), Age (5), Term/N (6), K(7), t(8)
+        // values = [FOM.value,omega.value,Benefit.value,0,1,age.value,termlength.value,k.value,t.value]
+        values = [parseFloat(FOM.value),parseFloat(omega.value),parseFloat(Benefit),0,1,parseFloat(age.value),parseFloat(termlength.value),parseFloat(k.value),parseFloat(t.value)]
+        console.log(values)
+        if(parseFloat(values[1])<parseFloat(values[5])+parseFloat(values[6])){
+            alert("OI")
+        }else{
+            console.log(values)
+            if(interesttype.value == "frequency"){
+                actual_interest = (1+parseFloat(interestinput.value)/Math.pow(parseFloat(InterestFrequencyV.value)),(parseFloat(InterestFrequencyV.value)))-1
+                values[3] = Math.log(1+actual_interest)
+            }else if(interesttype.value == "annual"){
+                actual_interest = parseFloat(interestinput.value)
+                values[3] = Math.log(1+actual_interest)
+            }else{
+                values[3] = parseFloat(interestinput.value)
+            }
+            if(assumption.value == "FOM"){
+                FOMOutput.innerHTML = values[0]   
+                tpxoutput.innerHTML = Math.exp(-(values[0]*values[8]))
+                kbarqxoutput.innerHTML = Math.exp(-(values[0]*values[7]))*(1-Math.exp(-1*values[0]))
+                expectedcontinuous.innerHTML = 1/values[0]
+                nyearexpectedcontinuous.innerHTML = 1/values[0]*(1-Math.exp(-1*values[0]*values[6]))
+                secondmomentTx.innerHTML = 2/Math.pow(values[0],2)
+                variancetx.innerHTML = 1/(values[0])*Math.pow(values[2],2)
+                expecteddiscrete.innerHTML = 1/(Math.exp(values[0])-1)
+                nyearexpecteddiscrete.innerHTML = (1-Math.exp(-1*values[0]*values[6]))/(Math.exp(values[0])-1)
+                lifeinsurance.innerHTML = values[0]/(values[0]+values[3])
+                nyearterminsurance.innerHTML = values[0]/(values[0]+values[3]) * (1-Math.exp(values[6]*(values[0]+values[3])*-1))
+                nyearpureendowment.innerHTML = Math.exp(-1*(values[6])*(values[0]+values[3]))
+                nyeardefferedlifeinsurance.innerHTML = Math.exp(-1*(values[6])*(values[0]+values[3]))*Math.exp(-1*values[6]*(values[0]+values[3]))
+                if(termtype.value == "Life"){
+                    nyearexpectedcontinuous.innerHTML = " - "
+                    nyearexpecteddiscrete.innerHTML = " - "
+                    nyearpureendowment.innerHTML = " - "
+                    nyearterminsurance.innerHTML = " - "
+                    nyeardefferedlifeinsurance.innerHTML = " - "
+                }
+            }else if(assumption.value == "Uniform"){
+                interest = Math.exp(values[3]) - 1
+                FOMOutput.innerHTML = 1/(values[1] - values[5])
+                tpxoutput.innerHTML = 1 - values[8]/(values[1] - values[5])
+                kbarqxoutput.innerHTML = 1/(values[1]-values[5])
+                expectedcontinuous.innerHTML = (values[1]-values[5])/2
+                nyearexpectedcontinuous.innerHTML = values[6] - Math.pow((values[6]),2)/(2*(values[1]-values[5]))
+                secondmomentTx.innerHTML = Math.pow((values[1]-values[5]),2)/3
+                variancetx.innerHTML = Math.pow((values[1]-values[5]),2)/12
+                expecteddiscrete.innerHTML = (values[1]-values[5]-1)/2 
+                nyearexpecteddiscrete.innerHTML = values[6]*(2*values[1]-2*values[5]-1-values[6])/(2*(values[1]-values[5]))
+                lifeinsurance.innerHTML = ((1)/(values[1]-values[5]))*((1-Math.exp(-1*values[3]*(values[1]-values[5])))/values[3])
+                nyearterminsurance.innerHTML = ((1)/(values[1]-values[5]))*((1-Math.exp(-1*values[3]*values[6]))/values[3])
+                nyearpureendowment.innerHTML = Math.exp(-1*values[3]*values[6])*(1- values[6]/(values[1]-values[5]))
+                nyeardefferedlifeinsurance.innerHTML = ((1)/(values[1]-values[5]))*((1-Math.exp(-1*values[3]*(values[1]-values[5]-values[6])))/values[3])*Math.exp(-1*values[3]*values[6])
+                discretenyearinsurance.innerHTML = interest/values[3] * ((1)/(values[1]-values[5]))*((1-Math.exp(-1*values[3]*values[6]))/values[3])
+                discretelifeinsurance.innerHTML = interest/values[3] * ((1)/(values[1]-values[5]))*((1-Math.exp(-1*values[3]*(values[1]-values[5])))/values[3])
+                discretenyearendowmentinsurance.innerHTML = interest/values[3] * ((1)/(values[1]-values[5]))*((1-Math.exp(-1*values[3]*values[6]))/values[3]) + Math.exp(-1*values[3]*values[6])*(1- values[6]/(values[1]-values[5]))
+                discretenyeardeferredinsurance.innerHTML = interest/values[3] * ((1)/(values[1]-values[5]))*((1-Math.exp(-1*values[3]*(values[1]-values[5]-values[6])))/values[3])*Math.exp(-1*values[3]*values[6])
+            }
+        }
+    }
+</script>
+</html>
