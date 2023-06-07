@@ -154,7 +154,7 @@
                 expectedcontinuous.innerHTML = 1/values[0]
                 nyearexpectedcontinuous.innerHTML = 1/values[0]*(1-Math.exp(-1*values[0]*values[6]))
                 secondmomentTx.innerHTML = 2/Math.pow(values[0],2)
-                variancetx.innerHTML = 1/(values[0])*Math.pow(values[2],2)
+                variancetx.innerHTML = 1/(Math.pow(values[0],2))
                 expecteddiscrete.innerHTML = 1/(Math.exp(values[0])-1)
                 nyearexpecteddiscrete.innerHTML = (1-Math.exp(-1*values[0]*values[6]))/(Math.exp(values[0])-1)
                 lifeinsurance.innerHTML = values[0]/(values[0]+values[3])
