@@ -47,6 +47,9 @@
         <tr id="discretelife2" class="Discrete"><td class="label">\(A_{x:\enclose{actuarial}{n}}\)</td><td class="value"><p id="discretenyearendowmentinsurance"></p></td></tr>
         <tr id="discretelife3" class="Discrete"><td class="label">\({}^{}_{n|}A_x\)</td><td class="value"><p id="discretenyeardeferredinsurance"></p></td></tr>
         <tr id="discretelife4" class="Discrete"><td class="label">\(A_x\)</td><td class="value"><p id="discretelifeinsurance"></p></td></tr>
+        <tr><td class="label">\(\bar a_x\)</td><td class="value"><p id="continuouswholelifeannuity"></p></td></tr>
+        <tr><td class="label">\(\bar a_{x:\enclose{actuarial}{n}}\)</td><td class="value"><p id="continuousnyeartemporarylifeannuity"></p></td></tr>
+        <tr><td class="label">\({}^{}_{n|}\bar a_x\)</td><td class="value"><p id="nyeradefferedcontinuouslifeannuity"></p></td></tr>
     </table>
     </div>
 </body>
@@ -83,6 +86,10 @@
     var discretenyearinsurance = document.getElementById("discretenyearinsurance")
     var discretenyearendowmentinsurance = document.getElementById("discretenyearendowmentinsurance")
     var discretenyeardeferredinsurance = document.getElementById("discretenyeardeferredinsurance")
+
+    var continuouswholelifeannuity = document.getElementById("continuouswholelifeannuity")
+    var continuousnyeartemporarylifeannuity = document.getElementById("continuousnyeartemporarylifeannuity")
+    var nyeradefferedcontinuouslifeannuity = document.getElementById("nyeradefferedcontinuouslifeannuity")
     // console.log(discreterows)
     interesttype.onchange = function(){
         if (interesttype.value =="frequency"){
@@ -100,25 +107,16 @@
             termlength.disabled = false;
             FOM.disabled = true
             omega.disabled = false
-            document.getElementById("discretelife1").style.visibility = "visible"
-            document.getElementById("discretelife2").style.visibility = "visible"
-            document.getElementById("discretelife3").style.visibility = "visible"
-            document.getElementById("discretelife4").style.visibility = "visible"
-            // for(var x=0;x<discreterows;x++){
-                //     discreterows[x].style.visibility = "collapse"
-            // }
-            
+            for(var x=0;x<4;x++){
+                document.getElementById("discretelife"+(x+1).toString()).style.visibility = "visible"
+            }
         }if(assumption.value == "FOM"){
             termtype.disabled = false;
             FOM.disabled = false
             omega.disabled = true
-            document.getElementById("discretelife1").style.visibility = "collapse"
-            document.getElementById("discretelife2").style.visibility = "collapse"
-            document.getElementById("discretelife3").style.visibility = "collapse"
-            document.getElementById("discretelife4").style.visibility = "collapse"
-            // for(var x=0;x<discreterows;x++){
-            //     discreterows[x].style.visibility = "visible"
-            // }
+            for(var x=0;x<4;x++){
+                document.getElementById("discretelife"+(x+1).toString()).style.visibility = "collapse"
+            }
         }
     }
     termtype.onchange = function(){
@@ -134,7 +132,7 @@
         // values = [FOM.value,omega.value,Benefit.value,0,1,age.value,termlength.value,k.value,t.value]
         values = [parseFloat(FOM.value),parseFloat(omega.value),parseFloat(Benefit),0,1,parseFloat(age.value),parseFloat(termlength.value),parseFloat(k.value),parseFloat(t.value)]
         console.log(values)
-        if(parseFloat(values[1])<parseFloat(values[5])+parseFloat(values[6])){
+        if((parseFloat(values[1])<parseFloat(values[5])+parseFloat(values[6]))&&assumption.value == "Uniform"){
             alert("OI")
         }else{
             console.log(values)
@@ -147,6 +145,7 @@
             }else{
                 values[3] = parseFloat(interestinput.value)
             }
+            d = 1 - Math.exp(-1*values[0])
             if(assumption.value == "FOM"){
                 FOMOutput.innerHTML = values[0]   
                 tpxoutput.innerHTML = Math.exp(-(values[0]*values[8]))
@@ -161,12 +160,15 @@
                 nyearterminsurance.innerHTML = values[0]/(values[0]+values[3]) * (1-Math.exp(values[6]*(values[0]+values[3])*-1))
                 nyearpureendowment.innerHTML = Math.exp(-1*(values[6])*(values[0]+values[3]))
                 nyeardefferedlifeinsurance.innerHTML = Math.exp(-1*(values[6])*(values[0]+values[3]))*Math.exp(-1*values[6]*(values[0]+values[3]))
+                continuouswholelifeannuity.innerHTML = (1-(values[0]/(values[0]+values[3])))/values[3]
+                continuousnyeartemporarylifeannuity.innerHTML = (1-values[0]/(values[0]+values[3]) * (1-Math.exp(values[6]*(values[0]+values[3])*-1)))/values[3]
+                nyeradefferedcontinuouslifeannuity.innerHTML = (Math.exp(-1*(values[0]+values[3])*values[6]))/(values[0]+values[3])
                 if(termtype.value == "Life"){
                     nyearexpectedcontinuous.innerHTML = " - "
                     nyearexpecteddiscrete.innerHTML = " - "
                     nyearpureendowment.innerHTML = " - "
                     nyearterminsurance.innerHTML = " - "
-                    nyeardefferedlifeinsurance.innerHTML = " - "
+                    nyeardefferedlifeinsurance.innerHTML = " - " 
                 }
             }else if(assumption.value == "Uniform"){
                 interest = Math.exp(values[3]) - 1
@@ -187,6 +189,9 @@
                 discretelifeinsurance.innerHTML = interest/values[3] * ((1)/(values[1]-values[5]))*((1-Math.exp(-1*values[3]*(values[1]-values[5])))/values[3])
                 discretenyearendowmentinsurance.innerHTML = interest/values[3] * ((1)/(values[1]-values[5]))*((1-Math.exp(-1*values[3]*values[6]))/values[3]) + Math.exp(-1*values[3]*values[6])*(1- values[6]/(values[1]-values[5]))
                 discretenyeardeferredinsurance.innerHTML = interest/values[3] * ((1)/(values[1]-values[5]))*((1-Math.exp(-1*values[3]*(values[1]-values[5]-values[6])))/values[3])*Math.exp(-1*values[3]*values[6])
+                continuouswholelifeannuity.innerHTML = (1 - interest/values[3] * ((1)/(values[1]-values[5]))*((1-Math.exp(-1*values[3]*(values[1]-values[5])))/values[3]))/values[3]
+                continuousnyeartemporarylifeannuity.innerHTML = (1 - interest/values[3] * ((1)/(values[1]-values[5]))*((1-Math.exp(-1*values[3]*(values[1]-values[5])))/values[3]))/values[3] - Math.exp(-1*values[6]*values[3])/values[3]+(1/(values[1]-values[5]))*((values[3]*values[6])*Math.exp(-1*values[3]*values[6])+Math.exp(values[3]*values[6]*-1))/(Math.pow(values[3],2))
+                nyeradefferedcontinuouslifeannuity.innerHTML = Math.exp(-1*values[6]*values[3])/values[3]+(1/(values[1]-values[5]))*((values[3]*values[6])*Math.exp(-1*values[3]*values[6])+Math.exp(values[3]*values[6]*-1))/(Math.pow(values[3],2))
             }
         }
     }
