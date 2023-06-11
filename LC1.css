@@ -48,8 +48,9 @@ body{
 }
 div{
     position: absolute;
+    /* border: 1.5px #444 solid; */
 }
-.Discrete
+.Discrete{
     visibility: collapse;
 }
 #buttondiv{
@@ -74,6 +75,8 @@ div{
 }
 table{
     width: 100%;
+    /* border: 1px black solid; */
+    /* background-color: white; */
     border-collapse: collapse;
 }
 th,td{
