@@ -49,7 +49,7 @@ body{
 div{
     position: absolute;
 }
-#discrete1,#discrete2,#discrete3,#discrete4{
+.Discrete
     visibility: collapse;
 }
 #buttondiv{
